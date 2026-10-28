@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * WARNING: Running tests will post and delete through the actual Twitter account when updating or saving VCR cassettes.
+ */
+
+declare(strict_types=1);
+
+namespace Abraham\TwitterOAuth\Test;
+
+use PHPUnit\Framework\TestCase;
+use Abraham\TwitterOAuth\TwitterOAuth;
+use Abraham\TwitterOAuth\MockHttpClient;
+
+class TwitterOAuthV2Test extends TestCase
+{
+    /** @var TwitterOAuth */
+    protected $twitter;
+    /** @var MockHttpClient */
+    protected $mockClient;
+
+    protected function setUp(): void
+    {
+        $this->mockClient = new MockHttpClient();
+        $this->twitter = new TwitterOAuth(
+            CONSUMER_KEY,
+            CONSUMER_SECRET,
+            ACCESS_TOKEN,
+            ACCESS_TOKEN_SECRET,
+            $this->mockClient,
+        );
+        $this->userId = explode('-', ACCESS_TOKEN)[0];
+    }
+
+    public function testV2GetUsers()
+    {
+        $this->mockClient->useFixture('testV2GetUsers');
+        $this->twitter->get('users', ['ids' => 12]);
+        $this->assertEquals(200, $this->twitter->getLastHttpCode());
+    }
+}
